@@ -7,7 +7,7 @@ import '../skirout/schema_change.dart' as schema_change;
 import '../skirout/structs.dart' as structs;
 import '../skirout/user.dart' as user;
 import '../skirout/vehicles/car.dart' as vehicles_car;
-import '../skirout/@gepheum/fantasy-game-skir-example/fantasy_game.dart'
+import '../skirout/@gepheum/skir-fantasy-game-example/fantasy_game.dart'
     as fantasy_game;
 import 'package:skir_client/skir_client.dart' as skir;
 
