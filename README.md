@@ -19,7 +19,7 @@ In your `skir.yml` file, add the following snippet under `generators`:
 The generated Dart code has a runtime dependency on the `skir_client` library. Add this line to your `pubspec.yaml` file under `dependencies`:
 
 ```yaml
-  skir_client: ^1.0.2  # Use the latest version
+  skir_client: any
 ```
 
 For more information, see this Dart project [example](https://github.com/gepheum/skir-dart-example).
