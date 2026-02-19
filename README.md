@@ -277,6 +277,37 @@ assert(reserializedJane.name == "Jane Doe");
 assert(serializer.fromBytes(johnBytes) == john);
 ```
 
+### Primitive serializers
+
+```dart
+assert(skir.Serializers.bool.toJson(true) == 1);
+assert(skir.Serializers.int32.toJson(3) == 3);
+assert(skir.Serializers.int64.toJson(9223372036854775807) ==
+    "9223372036854775807");
+assert(skir.Serializers.hash64.toJson(BigInt.parse("18446744073709551615")) ==
+    "18446744073709551615");
+assert(skir.Serializers.timestamp
+        .toJson(DateTime.fromMillisecondsSinceEpoch(1743682787000)) ==
+    1743682787000);
+assert(skir.Serializers.float32.toJson(3.14) == 3.14);
+assert(skir.Serializers.float64.toJson(3.14) == 3.14);
+assert(skir.Serializers.string.toJson("Foo") == "Foo");
+assert(
+    skir.Serializers.bytes.toJson(skir.ByteString.copy([1, 2, 3])) == "AQID");
+```
+
+### Composite serializers
+
+```dart
+assert(skir.Serializers.optional(skir.Serializers.string).toJson("foo") ==
+    "foo");
+assert(
+    skir.Serializers.optional(skir.Serializers.string).toJson(null) == null);
+
+print(skir.Serializers.iterable(skir.Serializers.bool).toJson([true, false]));
+// [1, 0]
+```
+
 ### Frozen lists and copies
 
 ```dart
