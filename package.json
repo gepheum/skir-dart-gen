@@ -47,7 +47,7 @@
     "mocha": "^11.7.5",
     "prettier": "^3.2.4",
     "prettier-plugin-organize-imports": "^4.2.0",
-    "skir": "^1.0.25",
+    "skir": "^1.1.10",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.2.2",
@@ -55,6 +55,7 @@
   },
   "overrides": {
     "diff": "^8.0.3",
-    "minimatch": "^10.2.2"
+    "minimatch": "^10.2.2",
+    "serialize-javascript": "^7.0.3"
   }
 }
