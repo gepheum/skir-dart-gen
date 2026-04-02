@@ -389,11 +389,11 @@ print(tarzan);
 
 ### Skir services
 
-#### Starting a skir service on an HTTP server
+#### Start a SkirRPC service on an HTTP server
 
 Full example [here](https://github.com/gepheum/skir-dart-example/blob/main/bin/start_service.dart).
 
-#### Sending RPCs to a skir service
+#### Sending RPCs to a SkirRPC service
 
 Full example [here](https://github.com/gepheum/skir-dart-example/blob/main/bin/call_service.dart).
 
