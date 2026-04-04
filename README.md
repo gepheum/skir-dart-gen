@@ -26,7 +26,7 @@ For more information, see this Dart project [example](https://github.com/gepheum
 
 ## Dart generated code guide
 
-The examples below are for the code generated from [this](https://github.com/gepheum/skir-dart-example/blob/main/lib/skir_src/user.skir) .skir file.
+The examples below are for the code generated from [this](https://github.com/gepheum/skir-dart-example/blob/main/skir-src/user.skir) .skir file.
 
 ### Referring to generated symbols
 
