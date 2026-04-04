@@ -127,9 +127,114 @@ void verifyAssertion(Assertion assertion) {
             (assertion as Assertion_reserializeLargeArrayWrapper).value;
         return reserializeLargeArrayAndVerify(value);
       }
+    case Assertion_kind.enumAFromJsonIsConstantWrapper:
+      {
+        final value =
+            (assertion as Assertion_enumAFromJsonIsConstantWrapper).value;
+        final parsed = value.keepUnrecognized
+            ? fromJsonKeepUnrecognized(
+                EnumA.serializer,
+                evaluateString(value.actual),
+              )
+            : fromJsonDropUnrecognized(
+                EnumA.serializer,
+                evaluateString(value.actual),
+              );
+        final actual = fromJsonDropUnrecognized(
+          EnumA.serializer,
+          toDenseJson(EnumA.serializer, parsed),
+        );
+        if (!_isEnumAConstant(actual)) {
+          throw AssertionError(
+            actual: actual,
+            expected: "EnumA constant A",
+          );
+        }
+        break;
+      }
+    case Assertion_kind.enumAFromBytesIsConstantWrapper:
+      {
+        final value =
+            (assertion as Assertion_enumAFromBytesIsConstantWrapper).value;
+        final parsed = value.keepUnrecognized
+            ? fromBytesKeepUnrecognized(
+                EnumA.serializer,
+                evaluateBytes(value.actual),
+              )
+            : fromBytesDropUnrecognizedFields(
+                EnumA.serializer,
+                evaluateBytes(value.actual),
+              );
+        final actual = fromBytesDropUnrecognizedFields(
+          EnumA.serializer,
+          toBytes(EnumA.serializer, parsed),
+        );
+        if (!_isEnumAConstant(actual)) {
+          throw AssertionError(
+            actual: actual,
+            expected: "EnumA constant A",
+          );
+        }
+        break;
+      }
+    case Assertion_kind.enumBFromJsonIsWrapperBWrapper:
+      {
+        final value =
+            (assertion as Assertion_enumBFromJsonIsWrapperBWrapper).value;
+        final actual = value.keepUnrecognized
+            ? fromJsonKeepUnrecognized(
+                EnumB.serializer,
+                evaluateString(value.actual),
+              )
+            : fromJsonDropUnrecognized(
+                EnumB.serializer,
+                evaluateString(value.actual),
+              );
+        final actualValue = _enumBWrapperValue(actual);
+        if (actualValue != value.expected) {
+          throw AssertionError(
+            actual: actualValue,
+            expected: value.expected,
+          );
+        }
+        break;
+      }
+    case Assertion_kind.enumBFromBytesIsWrapperBWrapper:
+      {
+        final value =
+            (assertion as Assertion_enumBFromBytesIsWrapperBWrapper).value;
+        final actual = value.keepUnrecognized
+            ? fromBytesKeepUnrecognized(
+                EnumB.serializer,
+                evaluateBytes(value.actual),
+              )
+            : fromBytesDropUnrecognizedFields(
+                EnumB.serializer,
+                evaluateBytes(value.actual),
+              );
+        final actualValue = _enumBWrapperValue(actual);
+        if (actualValue != value.expected) {
+          throw AssertionError(
+            actual: actualValue,
+            expected: value.expected,
+          );
+        }
+        break;
+      }
     case Assertion_kind.unknown:
       throw Exception("Unknown assertion kind");
   }
+}
+
+bool _isEnumAConstant(EnumA value) {
+  return value.kind == EnumA_kind.aConst;
+}
+
+String _enumBWrapperValue(EnumB value) {
+  return switch (value) {
+    EnumB_bWrapper(:var value) => value,
+    _ => "",
+  };
 }
 
 void reserializeValueAndVerify(Assertion_ReserializeValue input) {
@@ -523,6 +628,16 @@ TypedValueType<dynamic> evaluateTypedValue(TypedValue literal) {
         (literal as TypedValue_myEnumWrapper).value,
         MyEnum.serializer,
       );
+    case TypedValue_kind.enumAWrapper:
+      return TypedValueType(
+        (literal as TypedValue_enumAWrapper).value,
+        EnumA.serializer,
+      );
+    case TypedValue_kind.enumBWrapper:
+      return TypedValueType(
+        (literal as TypedValue_enumBWrapper).value,
+        EnumB.serializer,
+      );
     case TypedValue_kind.keyedArraysWrapper:
       return TypedValueType(
         (literal as TypedValue_keyedArraysWrapper).value,
@@ -693,6 +808,86 @@ TypedValueType<dynamic> evaluateTypedValue(TypedValue literal) {
                   .value),
         ),
         MyEnum.serializer,
+      );
+    case TypedValue_kind.enumAFromJsonKeepUnrecognizedWrapper:
+      return TypedValueType(
+        fromJsonKeepUnrecognized(
+          EnumA.serializer,
+          evaluateString(
+              (literal as TypedValue_enumAFromJsonKeepUnrecognizedWrapper)
+                  .value),
+        ),
+        EnumA.serializer,
+      );
+    case TypedValue_kind.enumAFromJsonDropUnrecognizedWrapper:
+      return TypedValueType(
+        fromJsonDropUnrecognized(
+          EnumA.serializer,
+          evaluateString(
+              (literal as TypedValue_enumAFromJsonDropUnrecognizedWrapper)
+                  .value),
+        ),
+        EnumA.serializer,
+      );
+    case TypedValue_kind.enumAFromBytesKeepUnrecognizedWrapper:
+      return TypedValueType(
+        fromBytesKeepUnrecognized(
+          EnumA.serializer,
+          evaluateBytes(
+              (literal as TypedValue_enumAFromBytesKeepUnrecognizedWrapper)
+                  .value),
+        ),
+        EnumA.serializer,
+      );
+    case TypedValue_kind.enumAFromBytesDropUnrecognizedWrapper:
+      return TypedValueType(
+        fromBytesDropUnrecognizedFields(
+          EnumA.serializer,
+          evaluateBytes(
+              (literal as TypedValue_enumAFromBytesDropUnrecognizedWrapper)
+                  .value),
+        ),
+        EnumA.serializer,
+      );
+    case TypedValue_kind.enumBFromJsonKeepUnrecognizedWrapper:
+      return TypedValueType(
+        fromJsonKeepUnrecognized(
+          EnumB.serializer,
+          evaluateString(
+              (literal as TypedValue_enumBFromJsonKeepUnrecognizedWrapper)
+                  .value),
+        ),
+        EnumB.serializer,
+      );
+    case TypedValue_kind.enumBFromJsonDropUnrecognizedWrapper:
+      return TypedValueType(
+        fromJsonDropUnrecognized(
+          EnumB.serializer,
+          evaluateString(
+              (literal as TypedValue_enumBFromJsonDropUnrecognizedWrapper)
+                  .value),
+        ),
+        EnumB.serializer,
+      );
+    case TypedValue_kind.enumBFromBytesKeepUnrecognizedWrapper:
+      return TypedValueType(
+        fromBytesKeepUnrecognized(
+          EnumB.serializer,
+          evaluateBytes(
+              (literal as TypedValue_enumBFromBytesKeepUnrecognizedWrapper)
+                  .value),
+        ),
+        EnumB.serializer,
+      );
+    case TypedValue_kind.enumBFromBytesDropUnrecognizedWrapper:
+      return TypedValueType(
+        fromBytesDropUnrecognizedFields(
+          EnumB.serializer,
+          evaluateBytes(
+              (literal as TypedValue_enumBFromBytesDropUnrecognizedWrapper)
+                  .value),
+        ),
+        EnumB.serializer,
       );
     case TypedValue_kind.unknown:
       throw Exception("Unknown typed value");

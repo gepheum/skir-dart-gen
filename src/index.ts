@@ -396,10 +396,11 @@ class DartSourceFileGenerator {
       `static const ${className} unknown = ${className}_unknown._instance;\n\n`,
     );
     for (const variant of constantVariants) {
+      const variantConstName = `${toLowerCamel(variant)}Const`;
       this.push(
         ...commentify(docToCommentText(variant.doc)),
         `static const ${enumVariantToDartName(variant)} = `,
-        `_${className}_consts.${toLowerCamel(variant)}Const;\n`,
+        `_${className}_consts.${variantConstName};\n`,
       );
     }
     this.pushEol();
@@ -533,11 +534,11 @@ class DartSourceFileGenerator {
       `${className}.serializer);\n`,
       "}\n\n",
     );
-    // The _consts_ internal enum
+    // The constant variants enum
     if (constantVariants.length) {
       this.push(`enum _${className}_consts implements ${className} {\n`);
       for (const variant of constantVariants) {
-        const name = toLowerCamel(variant) + "Const";
+        const name = `${toLowerCamel(variant)}Const`;
         this.push(`${name}(${className}_kind.${name}),\n`);
       }
       this.replaceEnd(",\n", ";\n\n");
@@ -546,8 +547,8 @@ class DartSourceFileGenerator {
         `const _${className}_consts(this.kind);\n\n`,
         "_core.String toString() => _skir.internal__stringify(this, ",
         `${className}.serializer);\n`,
+        "}\n\n",
       );
-      this.push("}\n\n"); // enum _consts
     }
     if (wrapperVariants.length) {
       // The _wrapper abstract class

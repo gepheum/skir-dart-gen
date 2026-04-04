@@ -253,10 +253,10 @@ packages:
     dependency: "direct main"
     description:
       name: skir_client
-      sha256: c90021c2ca8560135378e66815ec2ed09a423795d973881027e93302f7d123df
+      sha256: "10bd9f85f41bbe9a6df3390121ca4572c7c0bd735aeddd1170dc7e7d4b62e5f7"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.3"
+    version: "1.0.8"
   source_map_stack_trace:
     dependency: transitive
     description:
