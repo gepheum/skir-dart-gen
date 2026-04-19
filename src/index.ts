@@ -453,11 +453,15 @@ class DartSourceFileGenerator {
       "if (_serializerBuilder.mustInitialize()) {\n",
     );
     for (const constantVariant of constantVariants) {
+      const variantName = convertCase(
+        constantVariant.name.text,
+        "UPPER_UNDERSCORE",
+      );
       const dartName = enumVariantToDartName(constantVariant);
       this.push(
         "_serializerBuilder.addConstantVariant(\n",
         `${constantVariant.number},\n`,
-        `"${constantVariant.name.text}",\n`,
+        `"${variantName}",\n`,
         `"${dartName}",\n`,
         `${toDartStringLiteral(constantVariant.doc.text)},\n`,
         `${dartName},\n`,
