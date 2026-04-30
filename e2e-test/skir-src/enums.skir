@@ -1,17 +1,17 @@
 /// A day of the week
 enum Weekday {
-  MONDAY;
-  TUESDAY;
-  WEDNESDAY;
-  THURSDAY;
-  FRIDAY;
-  SATURDAY;
+  monday;
+  tuesday;
+  wednesday;
+  thursday;
+  friday;
+  saturday;
   /// Fun day
-  SUNDAY;
+  sunday;
 }
 
 enum JsonValue {
-  NULL = 1;
+  null = 1;
   /// A bool value
   boolean: bool = 100;
   number: float64 = 6;
@@ -27,7 +27,7 @@ enum JsonValue {
 enum EmptyEnum {}
 
 enum EnumWithNameConflict {
-  SERIALIZER;
+  serializer;
   if: bool;
 }
 
@@ -40,8 +40,8 @@ enum EnumWithStructField {
 }
 
 enum Kind {
-  FOO;
-  BAR;
+  foo;
+  bar;
   enum Kind {
     kind: bool;
   }
@@ -52,7 +52,7 @@ enum Kind {
 }
 
 enum Status {
-  OK;
+  ok;
 
   removed;
   removed;

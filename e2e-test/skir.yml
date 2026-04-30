@@ -5,4 +5,4 @@ generators:
 
 dependencies:
   "@gepheum/skir-fantasy-game-example": v1.0.0
-  "@gepheum/skir-golden-tests": v1.0.3
+  "@gepheum/skir-golden-tests": v1.0.6

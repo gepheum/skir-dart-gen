@@ -1,17 +1,17 @@
 enum EnumBefore {
-  A;
+  a;
   removed;
-  B;
+  b;
   c: string;
 }
 
 enum EnumAfter {
-  A;
+  a;
   removed;
   removed;
   removed;
   c: string;
-  D;
+  d;
 }
 
 struct FooBefore {
@@ -44,8 +44,8 @@ struct RemovalBefore {
   a: string;
   b: string;
   enum E {
-    C;
-    D;
+    c;
+    d;
     e: string;
   }
   es: [E];
@@ -55,7 +55,7 @@ struct RemovalAfter {
   removed;
   b: string;
   enum E {
-    C;
+    c;
     removed;
     removed;
   }
@@ -69,7 +69,7 @@ struct Zelda {
   }
   enum EnumBefore {}
   enum Enum {
-    A;
+    a;
   }
 
   struct StructHolderBefore {
