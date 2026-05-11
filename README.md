@@ -5,7 +5,7 @@
 
 Official plugin for generating Dart code from [.skir](https://github.com/gepheum/skir) files.
 
-Targets Dart 3.0 and higher.
+Targets Dart 3.5 and higher.
 
 ## Set up
 
