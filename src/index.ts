@@ -138,10 +138,12 @@ class DartSourceFileGenerator {
       if (field.isRecursive === "hard") {
         this.push(`final ${dartType}? _rec_${dartName};\n`);
         const defaultExpr = this.getDefaultExpression(type).expression;
+        this.push("@_core.override\n");
         this.push(
           `${dartType} get ${dartName} => _rec_${dartName} ?? ${defaultExpr};\n`,
         );
       } else {
+        this.push("@_core.override\n");
         this.push(`final ${dartType} ${dartName};\n`);
       }
     }
@@ -201,7 +203,8 @@ class DartSourceFileGenerator {
 
     this.push(
       "/// Returns this instance (no-op).\n",
-      "@_core.deprecated\n",
+      '@_core.Deprecated("This instance is already frozen.")\n',
+      "@_core.override\n",
       `${className} toFrozen() => this;\n\n`,
       "/// Returns a mutable shallow copy of this instance.\n",
       `${className}_mutable toMutable() => ${className}_mutable._(\n`,
@@ -212,11 +215,13 @@ class DartSourceFileGenerator {
     }
     this.push(
       ");\n\n",
+      "@_core.override\n",
       "_core.bool operator ==(other) {\n",
       "if (_core.identical(this, other)) return true;\n",
       `if (other is! ${className}) return false;\n`,
       "return _skir.internal__listEquality.equals(_equality_proxy, other._equality_proxy);\n",
       "}\n\n",
+      "@_core.override\n",
       "_core.int get hashCode => _skir.internal__listEquality.hash(_equality_proxy);\n\n",
       "_core.List get _equality_proxy => [\n",
     );
@@ -226,6 +231,7 @@ class DartSourceFileGenerator {
     }
     this.push(
       "];\n\n",
+      "@_core.override\n",
       "_core.String toString() => _skir.internal__stringify(this, serializer);\n\n",
       `/// Serializer for \`${className}\` instances.\n`,
       `static _skir.StructSerializer<${className}, ${className}_mutable> get serializer {\n`,
@@ -294,6 +300,7 @@ class DartSourceFileGenerator {
     this.writeMutableGetters(fields);
     this.push(
       "/// Returns a deeply immutable copy of this instance.\n",
+      "@_core.override\n",
       `${className} toFrozen() => ${className}(\n`,
     );
     for (const field of fields) {
@@ -528,9 +535,13 @@ class DartSourceFileGenerator {
       "final _skir.internal__UnrecognizedVariant? _u;\n\n",
       `const ${className}_unknown._() : _u = null;\n`,
       `${className}_unknown._unrecognized(this._u);\n\n`,
+      "@_core.override\n",
       `${className}_kind get kind => ${className}_kind.unknown;\n`,
+      "@_core.override\n",
       `_core.bool operator ==(other) => other is ${className}_unknown;\n`,
+      "@_core.override\n",
       "_core.int get hashCode => 8118964;\n",
+      "@_core.override\n",
       "_core.String toString() => _skir.internal__stringify(this, ",
       `${className}.serializer);\n`,
       "}\n\n",
@@ -544,8 +555,10 @@ class DartSourceFileGenerator {
       }
       this.replaceEnd(",\n", ";\n\n");
       this.push(
+        "@_core.override\n",
         `final ${className}_kind kind;\n\n`,
         `const _${className}_consts(this.kind);\n\n`,
+        "@_core.override\n",
         "_core.String toString() => _skir.internal__stringify(this, ",
         `${className}.serializer);\n`,
         "}\n\n",
@@ -556,11 +569,14 @@ class DartSourceFileGenerator {
       this.push(
         `sealed class _${className}_wrapper implements ${className} {\n`,
         "_core.dynamic get value;\n\n",
+        "@_core.override\n",
         "_core.bool operator ==(other) {\n",
         `if (other is! _${className}_wrapper) return false;\n`,
         "return kind == other.kind && value == other.value;\n",
         "}\n\n",
+        "@_core.override\n",
         "_core.int get hashCode => (kind._ordinal * 31) ^ value.hashCode;\n\n",
+        "@_core.override\n",
         "_core.String toString() => _skir.internal__stringify(this, ",
         `${className}.serializer);\n`,
         "}\n\n",
@@ -572,6 +588,7 @@ class DartSourceFileGenerator {
           `extends _${className}_wrapper {\n`,
           `final ${dartType} value;\n\n`,
           `${className}_${toLowerCamel(variant)}Wrapper._(this.value);\n\n`,
+          "@_core.override\n",
           `${className}_kind get kind => ${className}_kind.${toLowerCamel(variant)}Wrapper;\n`,
           "}\n\n",
         );
