@@ -72,7 +72,7 @@ class DartSourceFileGenerator {
       `,
     );
 
-    this.writeImports();
+    const importsOffset = this.code.length;
 
     for (const record of this.inModule.records) {
       const { recordType } = record.record;
@@ -91,6 +91,11 @@ class DartSourceFileGenerator {
     for (const constant of this.inModule.constants) {
       this.writeConstant(constant);
     }
+
+    const body = this.code.slice(importsOffset);
+    this.code = this.code.slice(0, importsOffset);
+    this.writeImports();
+    this.push(body);
 
     return this.joinLinesAndFixFormatting();
   }
@@ -783,12 +788,19 @@ class DartSourceFileGenerator {
     this.push('import "dart:core" as _core;\n');
     this.push('import "package:skir_client/skir_client.dart" as _skir;\n');
 
-    if (this.inModule.pathToImportedNames.length) {
+    const importedPaths = Object.keys(this.inModule.pathToImportedNames);
+    const importedPathSet = new Set(importedPaths);
+    const generatedPaths = [...this.typeSpeller.referencedModulePaths]
+      .filter((path) => !importedPathSet.has(path))
+      .sort();
+    importedPaths.push(...generatedPaths);
+
+    if (importedPaths.length) {
       this.pushEol();
     }
 
     const thisPath = paths.dirname(this.inModule.path);
-    for (const path of Object.keys(this.inModule.pathToImportedNames)) {
+    for (const path of importedPaths) {
       let dartPath = paths.relative(thisPath, path).replace(/\.skir/, ".dart");
       if (!dartPath.startsWith(".")) {
         dartPath = `./${dartPath}`;
