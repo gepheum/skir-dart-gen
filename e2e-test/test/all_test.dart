@@ -5,6 +5,7 @@ import '../skirout/full_name.dart' as full_name;
 import '../skirout/methods.dart' as methods;
 import '../skirout/schema_change.dart' as schema_change;
 import '../skirout/structs.dart' as structs;
+import '../skirout/transitive_dependency.dart' as transitive_dependency;
 import '../skirout/user.dart' as user;
 import '../skirout/vehicles/car.dart' as vehicles_car;
 import '../skirout/@gepheum/skir-fantasy-game-example/fantasy_game.dart'
@@ -306,6 +307,17 @@ void main() {
 
       expect(enums.JsonValue.null_, isA<enums.JsonValue>());
       expect(enums.JsonValue.wrapBoolean(true), isA<enums.JsonValue>());
+    });
+
+    test('enum convenience constructor with transitive field type', () {
+      final wrapped = enums.EnumWithTransitiveStructField.createWrapper(
+        value: transitive_dependency.TransitiveValue(text: "value"),
+      );
+
+      expect(
+        wrapped,
+        isA<enums.EnumWithTransitiveStructField_wrapperWrapper>(),
+      );
     });
 
     test('enum toString() formatting', () {

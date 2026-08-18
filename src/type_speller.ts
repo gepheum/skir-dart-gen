@@ -35,6 +35,8 @@ export class TypeSpeller {
     private readonly origin: Module,
   ) {}
 
+  readonly referencedModulePaths = new Set<string>();
+
   getDartType(
     type: ResolvedType,
     flavor: "initializer" | "frozen" | "mutable",
@@ -167,6 +169,9 @@ export class TypeSpeller {
       typeof recordOrKey === "string"
         ? this.recordMap.get(recordOrKey)!
         : recordOrKey;
+    if (record.modulePath !== this.origin.path) {
+      this.referencedModulePaths.add(record.modulePath);
+    }
     return getClassName(record, { origin: this.origin });
   }
 

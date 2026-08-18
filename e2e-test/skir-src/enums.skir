@@ -1,3 +1,5 @@
+import { TransitiveWrapper } from "transitive_wrapper.skir";
+
 /// A day of the week
 enum Weekday {
   monday;
@@ -37,6 +39,10 @@ enum EnumWithStructField {
     y: float32 = 1;
   }
   s: S = 1;
+}
+
+enum EnumWithTransitiveStructField {
+  wrapper: TransitiveWrapper;
 }
 
 enum Kind {
