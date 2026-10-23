@@ -2,6 +2,9 @@ generators:
   - mod: ../../../dist/index.js
     outDir: ./skirout
     config: {}
+  - mod: ../../../e2e-test/symbols_check.mjs
+    outDir: ./symbols_check/skirout
+    config: {}
 
 dependencies:
   "@gepheum/skir-fantasy-game-example": v1.0.0

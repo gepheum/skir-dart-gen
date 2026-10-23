@@ -14,6 +14,9 @@ In your `skir.yml` file, add the following snippet under `generators`:
   - mod: skir-dart-gen
     outDir: ./src/skirout
     config: {}
+    # Companion plugins that reference the generated code need its import URI:
+    # config:
+    #   importUriPrefix: package:my_app/skirout/
 ```
 
 The generated Dart code has a runtime dependency on the `skir_client` library. Add this line to your `pubspec.yaml` file under `dependencies`:
