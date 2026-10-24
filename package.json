@@ -33,7 +33,7 @@
     "lint:fix": "eslint src/**/*.ts --fix"
   },
   "dependencies": {
-    "skir-internal": "^0.1.1",
+    "skir-internal": "^0.2.22",
     "zod": "^4.2.1"
   },
   "devDependencies": {
