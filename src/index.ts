@@ -14,7 +14,14 @@ import {
 import { z } from "zod";
 import {
   enumVariantToDartName,
+  getKindConstantName,
+  getKindName,
+  getMethodName,
   getModuleAlias,
+  getModuleImportUri,
+  getUnqualifiedClassName,
+  getWrapFactoryName,
+  getWrapperClassName,
   structFieldToDartName,
   toLowerCamel,
   toTopLevelConstantName,
@@ -22,7 +29,10 @@ import {
 } from "./naming.js";
 import { TypeSpeller } from "./type_speller.js";
 
-const Config = z.strictObject({});
+const Config = z.strictObject({
+  /** Package URI prefix of the generated files; symbols() needs it for companion imports. */
+  importUriPrefix: z.string().optional(),
+});
 
 type Config = z.infer<typeof Config>;
 
@@ -35,11 +45,59 @@ class DartCodeGenerator implements CodeGenerator<Config> {
     const outputFiles: CodeGenerator.OutputFile[] = [];
     for (const module of input.modules) {
       outputFiles.push({
-        path: module.path.replace(/\.skir$/, ".dart"),
+        path: getModuleImportUri("", module.path),
         code: new DartSourceFileGenerator(module, recordMap, config).generate(),
       });
     }
     return { files: outputFiles };
+  }
+
+  symbols(input: CodeGenerator.Input<Config>): CodeGenerator.SymbolProvider {
+    const { importUriPrefix } = input.config;
+    if (importUriPrefix === undefined) {
+      throw new Error("skir-dart-gen symbols require importUriPrefix");
+    }
+    const inModule = (
+      modulePath: string,
+      name: string,
+    ): CodeGenerator.Symbol => {
+      const alias = getModuleAlias(modulePath);
+      return {
+        reference: `${alias}.${name}`,
+        imports: [
+          `import "${getModuleImportUri(importUriPrefix, modulePath)}" as ${alias};`,
+        ],
+      };
+    };
+    return {
+      record: (location) =>
+        inModule(location.modulePath, getUnqualifiedClassName(location)),
+      method: (module, method) => inModule(module.path, getMethodName(method)),
+      variant: (location, variant) =>
+        inModule(location.modulePath, getKindName(location, variant)),
+      variantConstructor: (location, variant): CodeGenerator.Symbol => {
+        const className = getUnqualifiedClassName(location);
+        return inModule(
+          location.modulePath,
+          variant.type
+            ? `${className}.${getWrapFactoryName(variant)}({value})`
+            : `${className}.${enumVariantToDartName(variant)}`,
+        );
+      },
+      variantValue: (location, variant): CodeGenerator.Symbol => {
+        if (!variant.type) {
+          throw new TypeError(`${variant.name.text} is a constant variant`);
+        }
+        const symbol = inModule(
+          location.modulePath,
+          getWrapperClassName(location, variant),
+        );
+        return {
+          reference: `({value} as ${symbol.reference}).value`,
+          imports: symbol.imports,
+        };
+      },
+    };
   }
 }
 
@@ -424,16 +482,16 @@ class DartSourceFileGenerator {
           `Create a '${variant.name.text}' variant wrapping around the given value.\n`,
           docToCommentText(variant.doc),
         ]),
-        `factory ${className}.wrap${toUpperCamel(variant)}(\n`,
+        `factory ${className}.${getWrapFactoryName(variant)}(\n`,
         `${dartType} value\n`,
-        `) => ${className}_${toLowerCamel(variant)}Wrapper._(value);\n\n`,
+        `) => ${getWrapperClassName(record, variant)}._(value);\n\n`,
       );
       if (type.kind === "record") {
         const record = typeSpeller.recordMap.get(type.key)!;
         if (record.record.recordType === "struct") {
           const struct = record.record;
           const structName = typeSpeller.getClassName(record);
-          const wrapName = `wrap${toUpperCamel(variant)}`;
+          const wrapName = getWrapFactoryName(variant);
           this.push(
             `/// Same as \`${wrapName}(${structName}(...))\`.\n`,
             `factory ${className}.create${toUpperCamel(variant)}(`,
@@ -484,12 +542,12 @@ class DartSourceFileGenerator {
         "_serializerBuilder.addWrapperVariant(\n",
         `${wrapperVariant.number},\n`,
         `"${wrapperVariant.name.text}",\n`,
-        `"wrap${toUpperCamel(wrapperVariant)}",\n`,
+        `"${getWrapFactoryName(wrapperVariant)}",\n`,
         `${serializerExpr},\n`,
         `${toDartStringLiteral(wrapperVariant.doc.text)},\n`,
-        `${className}_${toLowerCamel(wrapperVariant)}Wrapper._,\n`,
+        `${getWrapperClassName(record, wrapperVariant)}._,\n`,
         "(it) => it.value,\n",
-        `ordinal: ${className}_kind.${toLowerCamel(wrapperVariant)}Wrapper._ordinal,\n`,
+        `ordinal: ${className}_kind.${getKindConstantName(wrapperVariant)}._ordinal,\n`,
         ");\n",
       );
     }
@@ -521,11 +579,11 @@ class DartSourceFileGenerator {
     let ordinalCounter = 1;
     for (const variant of constantVariants) {
       const ordinal = ordinalCounter++;
-      this.push(`${toLowerCamel(variant)}Const(${ordinal}),\n`);
+      this.push(`${getKindConstantName(variant)}(${ordinal}),\n`);
     }
     for (const variant of wrapperVariants) {
       const ordinal = ordinalCounter++;
-      this.push(`${toLowerCamel(variant)}Wrapper(${ordinal}),\n`);
+      this.push(`${getKindConstantName(variant)}(${ordinal}),\n`);
     }
     this.replaceEnd(",\n", ";\n\n");
     this.push(
@@ -589,12 +647,12 @@ class DartSourceFileGenerator {
       for (const variant of wrapperVariants) {
         const dartType = typeSpeller.getDartType(variant.type!, "frozen");
         this.push(
-          `final class ${className}_${toLowerCamel(variant)}Wrapper `,
+          `final class ${getWrapperClassName(record, variant)} `,
           `extends _${className}_wrapper {\n`,
           `final ${dartType} value;\n\n`,
-          `${className}_${toLowerCamel(variant)}Wrapper._(this.value);\n\n`,
+          `${getWrapperClassName(record, variant)}._(this.value);\n\n`,
           "@_core.override\n",
-          `${className}_kind get kind => ${className}_kind.${toLowerCamel(variant)}Wrapper;\n`,
+          `${className}_kind get kind => ${className}_kind.${getKindConstantName(variant)};\n`,
           "}\n\n",
         );
       }
@@ -604,7 +662,7 @@ class DartSourceFileGenerator {
   private writeMethod(method: Method): void {
     const { typeSpeller } = this;
     const methodName = method.name.text;
-    const skirName = convertCase(methodName, "lowerCamel") + "Method";
+    const skirName = getMethodName(method);
     const requestType = typeSpeller.getDartType(method.requestType!, "frozen");
     const requestSerializerExpr = typeSpeller.getSerializerExpression(
       method.requestType!,

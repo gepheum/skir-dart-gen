@@ -1,6 +1,7 @@
 import {
   Constant,
   Field,
+  Method,
   Module,
   RecordLocation,
   convertCase,
@@ -54,14 +55,7 @@ export function getClassName(
     origin: Module;
   },
 ): string {
-  const { recordAncestors } = record;
-  const parts: string[] = [];
-  for (let i = 0; i < recordAncestors.length; ++i) {
-    const record = recordAncestors[i]!;
-    parts.push(record.name.text);
-  }
-
-  const name = parts.join("_");
+  const name = getUnqualifiedClassName(record);
 
   if (origin.origin.path === record.modulePath) {
     return name;
@@ -69,6 +63,47 @@ export function getClassName(
     const alias = getModuleAlias(record.modulePath);
     return `${alias}.${name}`;
   }
+}
+
+/** Returns the name of the frozen Dart class within its own module. */
+export function getUnqualifiedClassName(record: RecordLocation): string {
+  return record.recordAncestors.map((r) => r.name.text).join("_");
+}
+
+/** Returns the name of the generated method descriptor. */
+export function getMethodName(method: Method): string {
+  return convertCase(method.name.text, "lowerCamel") + "Method";
+}
+
+/** Returns the constant of the generated kind enum for the given variant. */
+export function getKindConstantName(variant: Field): string {
+  return toLowerCamel(variant) + (variant.type ? "Wrapper" : "Const");
+}
+
+/** Returns the kind enum constant of the given variant within its own module. */
+export function getKindName(record: RecordLocation, variant: Field): string {
+  return `${getUnqualifiedClassName(record)}_kind.${getKindConstantName(variant)}`;
+}
+
+/** Returns the class generated for the given wrapper variant. */
+export function getWrapperClassName(
+  record: RecordLocation,
+  variant: Field,
+): string {
+  return `${getUnqualifiedClassName(record)}_${toLowerCamel(variant)}Wrapper`;
+}
+
+/** Returns the factory that wraps a value into the given wrapper variant. */
+export function getWrapFactoryName(variant: Field): string {
+  return `wrap${toUpperCamel(variant)}`;
+}
+
+/** Returns the import URI of the Dart file generated for the given module. */
+export function getModuleImportUri(
+  importUriPrefix: string,
+  modulePath: string,
+): string {
+  return importUriPrefix + modulePath.replace(/\.skir$/, ".dart");
 }
 
 export function getModuleAlias(modulePath: string): string {
